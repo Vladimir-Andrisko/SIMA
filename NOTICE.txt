@@ -1,0 +1,2 @@
+This project includes source code from Dynamixel2Arduino by ROBOTIS,
+licensed under Apache License 2.0.
