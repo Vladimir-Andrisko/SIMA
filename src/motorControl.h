@@ -76,6 +76,8 @@ public:
     bool moveMotorsMM(double, double, bool);
     bool rotateMotorsMM(float, bool);
     float traversed_distance();
+
+    bool serial_debugging(HardwareSerial& port = Serial);
     
 };
 

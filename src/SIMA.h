@@ -20,6 +20,8 @@ public:
     bool move(float, float, float, int, uint8_t, bool);
     bool rotate(float, int, bool);
     bool navigate(float, float, float);
+
+    bool serial_debugging(HardwareSerial& port = Serial);
 };
 
 #endif

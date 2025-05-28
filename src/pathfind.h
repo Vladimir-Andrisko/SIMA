@@ -79,7 +79,10 @@ private:
 
 public:
     // Constructor that sets width and height, defaults to max values
-    Grid(int w = 20, int h = 30);
+    Grid(int w = MAX_WIDTH, int h = MAX_HEIGHT);
+
+    bool serial_debugging(pos start, pos end, HardwareSerial& serial = Serial);
+    void serial_print_grid(HardwareSerial& serial = Serial);
 
     // Statically creates the grid for memory optimization
     void construct_grid();

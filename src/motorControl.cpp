@@ -252,6 +252,84 @@ float MotorControl::traversed_distance(){
   
 }
 
+bool MotorControl::serial_debugging(HardwareSerial& port){
+  if(!port){
+    return false;
+  }
+
+  port.println("----------------------------");
+  port.println(" Debugging motor control!");
+  port.println("----------------------------\n\n");
+
+  bool connected = true;
+  port.println("[INFO] Pinging motors...");
+
+  for(int i = 0; i < id_count; i++){
+    if(!dxl.ping(ID_list[i])){
+      port.print("[ERROR] No connection with motor ID: ");
+      port.println(ID_list[i]);
+      connected = false;
+    }else{
+      port.print("[OK] Connected to motor ID: ");
+      port.println(ID_list[i]);
+    }
+  }
+  if(!connected){
+    return false;
+  }
+
+  port.println("[INFO] Checking motor position");
+  if(!readPosition()){
+    port.println("[ERROR] Failed to get position!\n");
+    return false;
+  }
+  port.print("[OK] Motor position: ");
+  port.print(position[0]); port.print(", "); port.print(position[1]);
+  port.print("\n");
+
+  port.println("[INFO] Changing velocity to 100");
+  port.println("[INFO] Changing acceleration to 20");
+
+  if(!changeVelocity(100, 100)){
+    port.println("[ERROR] Failed to set velocity!\n\n");
+    return false;
+  }
+
+  if(!changeAcceleration(20, 20)){
+    port.println("[ERROR] Failed to set acceleration!\n\n");
+    return false;
+  }
+
+  port.println("[OK] Velocity set to 100");
+  port.println("[OK] Acceleration set to 20\n");
+  port.println("[INFO] Resetting motors");
+
+  if(!resetMotors()){
+    port.println("[ERROR] Failed to reset motors!\n");
+    return false;
+  }
+
+  port.println("[INFO] Moving forward 10cm");
+  if(!moveMotorsMM(100, 100)){
+    port.println("[ERROR] Failed to move motors!\n");
+    return false;
+  }
+  port.println("[OK] Motors moved 10cm forward");
+
+  port.println("[INFO] Moving backward 10cm");
+  if(!moveMotorsMM(100, 100)){
+    port.println("[ERROR] Failed to move motors!\n");
+    return false;
+  }
+  port.println("[OK] Motors moved 10cm backward");
+
+  port.println("\n----------------------------");
+  port.println("   End of debugging!");
+  port.println("----------------------------\n\n");
+
+  return true;
+}
+
 bool readSensorsTemp(){
   return false;       // will implement logic for sensors later
 }                     // hopefully

@@ -70,3 +70,26 @@ bool SIMA::move(float goal_x, float goal_y, float goal_angle, int speed, uint8_t
 
     return true;
 }
+
+bool SIMA::serial_debugging(HardwareSerial& port){
+    if(!port){
+        return false;
+    }
+
+    port.println("PRINTING INFO OF SIMA!\n\n");
+    pos start;
+    start.x = 0;
+    start.y = 0;
+    pos end;
+    start.x = 15;
+    start.y = 17;
+
+    if(!grid.serial_debugging(start, end, port)){
+        return false;
+    }
+    if(!motors.serial_debugging(port)){
+        return false;
+    }
+
+    return true;
+}

@@ -112,6 +112,89 @@ Grid::Grid(int w, int h){           // Makes sure that maximum height and width 
     return os;
 }*/
 
+bool Grid::serial_debugging(pos start, pos end, HardwareSerial& serial){
+    if(!serial){
+        return false;
+    }
+
+    serial.println("----------------------------------");
+    serial.println(" Debugging grid for pathfinding!");
+    serial.println("----------------------------------");
+    serial.println("\nLegend:");
+    serial.println("S - starting node");
+    serial.println("F - end node");
+    serial.println("# - wall");
+    serial.println("W - walkable node");
+    serial.println("P - path node");
+    serial.println("X - closed node after evaluation");
+    serial.println("O - open node for evaluation");
+    serial.println("\n\n");
+
+    serial_print_grid(serial);
+    
+    Node *start_node = get_node(start.x, start.y);
+    Node *end_node = get_node(end.x, end.y);
+
+    serial.println("[INFO] Exploring the path.\n\n");
+
+    unsigned int start_time = millis();
+    vector<pos> path = pathfind(*this, start_node->get_position(), end_node->get_position());
+    unsigned int duration = millis() - start_time;
+
+    serial_print_grid(serial);
+
+    if(path.empty()){
+        serial.println("[ERROR] Couldn't find the path\n\n");
+
+        serial.println("----------------------------------");
+        serial.println(" End of debugging grid");
+        serial.println("----------------------------------\n\n");
+
+        return false;
+    }
+
+    serial.println("[OK] Found the path\n");
+    serial.print("[OK] Time to find the path: ");
+    serial.print(duration); serial.println("milliseconds");
+    serial.print("[INFO] Size of grid in bytes: ");
+    serial.println(sizeof(Grid));
+    serial.println("\nPath(x,y):");
+
+    for(int i = 0; i < path.size(); i++){
+        serial.print("Node "); serial.print(i+1);
+        serial.print(" (");serial.print(path[i].x);
+        serial.print(path[i].y);serial.println(")\n\n");
+    }
+
+    serial.println("----------------------------------");
+    serial.println(" End of debugging");
+    serial.println("----------------------------------\n\n");
+
+    return true;
+}
+
+void Grid::serial_print_grid(HardwareSerial& serial){
+    for(int y = 0; y < height; y++){
+        serial.println(" ");
+
+        for(int x = 0; x < width; x++){
+            State state = get_node(x, y)->get_state();
+
+            switch(state){
+                case WALL: serial.print("# "); break;
+                case START: serial.print("S "); break;
+                case FINISH: serial.print("F "); break;
+                case WALKABLE: serial.print("W "); break;
+                case OPEN: serial.print("O "); break;
+                case CLOSED: serial.print("X "); break;
+                case PATH: serial.print("P "); break;
+                default: serial.print("? "); break;
+            }
+        }
+    }
+    serial.println("\n\n");
+}
+
 Node* Grid::get_node(int x, int y){
     if((x >= 0 && x < width) && (y >= 0 && y < height)){
         return &map[y][x];    
